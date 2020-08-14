@@ -322,8 +322,8 @@ class Attribute extends CI_Model
 				}
 			}
 
-		//To DROPDOWN or CHECKBOX
-			else if($to_type === DROPDOWN)
+		//To DROPDOWN, LONGTEXT or CHECKBOX
+			else if(in_array($to_type, [DROPDOWN, LONGTEXT], TRUE))
 			{
 				$success = TRUE;
 			}
@@ -586,27 +586,34 @@ class Attribute extends CI_Model
 	{
 		$this->db->trans_start();
 
-		//New Attribute
+		$locale_date_format = $this->Appconfig->get('dateformat');
+
 		if(empty($attribute_id) || empty($item_id))
 		{
-			if(in_array($definition_type, [TEXT, DROPDOWN, CHECKBOX], TRUE))
-			{
-				$attribute_id = $this->value_exists($attribute_value);
+		//Update attribute_value
+			$attribute_id = $this->value_exists($attribute_value, $definition_type);
 
-				if(empty($attribute_id))
+			if($attribute_id === FALSE)
 				{
-					$this->db->insert('attribute_values', array('attribute_value' => $attribute_value));
-				}
-			}
-			else if($definition_type == DECIMAL)
+				switch($definition_type)
 			{
-				$this->db->insert('attribute_values', array('attribute_decimal' => $attribute_value));
-			}
-			else
-			{
-				$this->db->insert('attribute_values', array('attribute_date' => date('Y-m-d', strtotime($attribute_value))));
+					case DATE:
+						$data_type				= 'date';
+						$attribute_date_value	= DateTime::createFromFormat($locale_date_format, $attribute_value);
+						$attribute_value		= $attribute_date_value->format('Y-m-d');
+						break;
+					case DECIMAL:
+						$data_type	= 'decimal';
+						break;
+					default:
+						$data_type	= 'value';
+						break;
 			}
 
+				$this->db->insert('attribute_values', array("attribute_$data_type" => $attribute_value));
+			}
+
+		//Update attribute_link
 			$attribute_id = $attribute_id ? $attribute_id : $this->db->insert_id();
 
 			$this->db->insert('attribute_links', array(
@@ -614,24 +621,25 @@ class Attribute extends CI_Model
 				'item_id' => empty($item_id) ? NULL : $item_id,
 				'definition_id' => $definition_id));
 		}
-
-		//Existing Attribute
 		else
 		{
-			$this->db->where('attribute_id', $attribute_id);
+			switch($definition_type)
+			{
+				case DATE:
+					$data_type				= 'date';
+					$attribute_date_value	= DateTime::createFromFormat($locale_date_format, $attribute_value);
+					$attribute_value		= $attribute_date_value->format('Y-m-d');
+					break;
+				case DECIMAL:
+					$data_type	= 'decimal';
+					break;
+				default:
+					$data_type	= 'value';
+					break;
+			}
 
-			if(in_array($definition_type, [TEXT, DROPDOWN], TRUE))
-			{
-				$this->db->update('attribute_values', array('attribute_value' => $attribute_value));
-			}
-			else if($definition_type == DECIMAL)
-			{
-				$this->db->update('attribute_values', array('attribute_decimal' => $attribute_value));
-			}
-			else
-			{
-				$this->db->update('attribute_values', array('attribute_date' => date('Y-m-d', strtotime($attribute_value))));
-			}
+				$this->db->where('attribute_id', $attribute_id);
+				$this->db->update('attribute_values', array("attribute_$data_type" => $attribute_value));
 		}
 
 		$this->db->trans_complete();

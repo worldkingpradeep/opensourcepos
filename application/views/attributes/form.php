@@ -93,6 +93,14 @@ $(document).ready(function()
 			$("#definition_type option:contains('DATE')").hide();
 			$("#definition_type option:contains('DECIMAL')").hide();
 		}
+		else if(definition_type == "LONGTEXT")
+		{
+			$("#definition_type option:contains('GROUP')").hide();
+			$("#definition_type option:contains('DATE')").hide();
+			$("#definition_type option:contains('DECIMAL')").hide();
+			$("#definition_type option:contains('CHECKBOX')").hide();
+			$("#definition_type option:contains('DROPDOWN')").hide();
+		}
 		else
 		{
 			$("#definition_type option:contains('GROUP')").hide();
@@ -114,18 +122,18 @@ $(document).ready(function()
 
 	var show_hide_fields = function(event)
 	{
+		var is_category_dropdown = definition_id == -1;
+		var is_no_group = $('#definition_type').val() !== '0';
 	    var is_dropdown = $('#definition_type').val() !== '1';
 	    var is_decimal = $('#definition_type').val() !== '2';
-	    var is_no_group = $('#definition_type').val() !== '0';
-	    var is_category_dropdown = definition_id == -1;
+		var is_longtext = $('#definition_type').val() !== '6';
 
 		$('#definition_value, #definition_list_group').parents('.form-group').toggleClass('hidden', is_dropdown);
 		$('#definition_unit').parents('.form-group').toggleClass('hidden', is_decimal);
 
-	//Appropriately show definition flags if not category_dropdown
-		if(definition_id != -1)
+		if(!is_category_dropdown)
 		{
-			$('#definition_flags').parents('.form-group').toggleClass('hidden', !is_no_group);
+			$('#definition_flags').parents('.form-group').toggleClass('hidden', (!is_no_group || !is_longtext));
 		}
 	};
 
