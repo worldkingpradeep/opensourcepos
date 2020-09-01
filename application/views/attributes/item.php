@@ -40,7 +40,7 @@ foreach($definition_values as $definition_id => $definition_value)
 					echo form_input("attribute_links[$definition_id]", $value, "class='form-control valid_chars' data-definition-id='$definition_id'");
 				}
 
-				else if($definition_value['definition_type'] == LONGTEXT)
+				else if($definition_value['definition_type'] === LONGTEXT)
 				{
 					$value = (empty($attribute_value) || empty($attribute_value->attribute_value)) ? $definition_value['selected_value'] : $attribute_value->attribute_value;
 					echo form_textarea(array(
@@ -49,7 +49,6 @@ foreach($definition_values as $definition_id => $definition_value)
 						'class'	=> 'form-control input-sm',
 						'value'	=> $value,
 						'data-definition-id' => $definition_id));
-
 				}
 				else if ($definition_value['definition_type'] == DECIMAL)
 				{
