@@ -843,12 +843,11 @@ class Items extends Secure_Controller
 			{
 				set_time_limit(240);
 
-				$failCodes					= [];
-				$third_party_data			= [];
-				$csv_rows					= get_csv_file($_FILES['file_path']['tmp_name']);
-				$employee_id				= $this->Employee->get_logged_in_employee_info()->person_id;
-				$allowed_stock_locations	= $this->Stock_location->get_allowed_locations();
-				$attribute_definition_names	= $this->Attribute->get_definition_names();
+				$failCodes = [];
+				$csv_rows = get_csv_file($_FILES['file_path']['tmp_name']);
+				$employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+				$allowed_stock_locations = $this->Stock_location->get_allowed_locations();
+				$attribute_definition_names = $this->Attribute->get_definition_names();
 
 				unset($attribute_definition_names[-1]);
 
