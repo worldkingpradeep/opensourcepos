@@ -1,7 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-/**
- * Attribute class
- */
+
 class Attribute extends CI_Model
 {
 	const SHOW_IN_ITEMS = 1;

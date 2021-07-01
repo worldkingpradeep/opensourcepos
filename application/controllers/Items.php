@@ -7,7 +7,6 @@ class Items extends Secure_Controller
 	public function __construct()
 	{
 		parent::__construct('items');
-
 		$this->load->library('item_lib');
 	}
 
@@ -899,7 +898,7 @@ class Items extends Secure_Controller
 					if(!empty($row['Barcode']))
 					{
 						$item_data['item_number'] = $row['Barcode'];
-						$is_failed_row = $this->Item->item_number_exists($item_data['item_number']);
+						$is_failed_row = $this->Item->item_number_exists($item_data['item_number']) && !is_update;
 					}
 
 					if(!$is_failed_row)
@@ -912,9 +911,9 @@ class Items extends Secure_Controller
 
 					if(!$is_failed_row && $this->Item->save($item_data, $item_id))
 					{
-						$this->save_tax_data($line, $item_data);
-						$this->save_inventory_quantities($line, $item_data, $allowed_stock_locations, $employee_id);
-						$invalidated = $this->save_attribute_data($line, $item_data, $attribute_definition_names);
+						$this->save_tax_data($row, $item_data);
+						$this->save_inventory_quantities($row, $item_data, $allowed_stock_locations, $employee_id);
+						$invalidated = $this->save_attribute_data($row, $item_data, $attribute_definition_names);
 					}
 					else
 					{
@@ -1158,19 +1157,19 @@ class Items extends Secure_Controller
 	{
 	//Quantities & Inventory Section
 		$comment			= $this->lang->line('items_inventory_CSV_import_quantity');
-		$is_update			= $row['Id'] ? TRUE : FALSE;
+		$is_update			= (bool)$row['Id'];
 
 		foreach($allowed_locations as $location_id => $location_name)
 		{
 			$item_quantity_data = array(
-				'item_id' 		=> $item_data['item_id'],
-				'location_id'	=> $location_id);
+				'item_id' => $item_data['item_id'],
+				'location_id' => $location_id);
 
 			$csv_data = array(
-				'trans_items'		=> $item_data['item_id'],
-				'trans_user'		=> $employee_id,
-				'trans_comment'		=> $comment,
-				'trans_location'	=> $location_id);
+				'trans_items' => $item_data['item_id'],
+				'trans_user' => $employee_id,
+				'trans_comment' => $comment,
+				'trans_location' => $location_id);
 
 			if(!empty($row["location_$location_name"]) || $row["location_$location_name"] === '0')
 			{
