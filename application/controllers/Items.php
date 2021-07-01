@@ -94,7 +94,7 @@ class Items extends Secure_Controller
 			$image_path = $images[0];
 			$thumb_path = $base_path . $this->image_lib->thumb_marker . '.' . $file_extension;
 
-			if(sizeof($images) < 2 && !file_exists($thumb_path))
+			if(sizeof($images) < 2)
 			{
 				$config['image_library']	= 'gd2';
 				$config['source_image']		= $image_path;
