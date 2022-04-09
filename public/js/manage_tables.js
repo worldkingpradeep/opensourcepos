@@ -257,7 +257,7 @@
 			iconSize: 'sm',
 			silentSort: true,
 			paginationVAlign: 'bottom',
-			escape: false
+			escape: true
 		}));
 		enable_actions();
 		init_delete();
